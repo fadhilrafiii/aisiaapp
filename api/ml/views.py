@@ -1,18 +1,19 @@
 from bson.objectid import ObjectId
-from django.utils import timezone
-from rest_framework import viewsets
-from rest_framework.response import Response
-from rest_framework.filters import SearchFilter, OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import serializers
-from api.ml.serializers import MLSerializer
-from api.objects.models import Object
-from utils.file import get_file_size
+from rest_framework import viewsets
+from rest_framework.filters import OrderingFilter
+from rest_framework.filters import SearchFilter
+from rest_framework.response import Response
+
 from .models import ML
-from utils.response import VsionResponse
+from api.ml.serializers import MLSerializer
+from services.s3 import S3Service
+from utils.file import get_file_size
 from utils.pagination import VsionPagination
 from utils.parse import parse_s3_path
-from services.s3 import S3Service
-from django_filters.rest_framework import DjangoFilterBackend
+from utils.response import VsionResponse
+
 
 class MLViewSet(viewsets.ModelViewSet):
     serializer_class = ML
@@ -62,10 +63,10 @@ class MLViewSet(viewsets.ModelViewSet):
         try:
             data = request.POST.dict()
 
-            if not "file" in request.FILES:
+            if "file" not in request.FILES:
                 raise KeyError({"file": ["A valid file is required."]})
 
-            if not "version" in data:
+            if "version" not in data:
                 raise KeyError({"version": ["A valid integer is required."]})
 
             file = request.FILES["file"]

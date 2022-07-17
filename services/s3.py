@@ -1,6 +1,7 @@
-from django.conf import settings
 import boto3
 import botocore
+from django.conf import settings
+
 from utils.parse import get_s3_file_endpoint
 
 

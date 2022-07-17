@@ -1,23 +1,25 @@
+import logging
+
 from bson.objectid import ObjectId
-from rest_framework import viewsets, serializers
-from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework import serializers
+from rest_framework import viewsets
+from rest_framework.filters import OrderingFilter
+from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
-from api.objects.serializers import ObjectSerializer
-from utils.file import (
-    convert_img_to_jpg,
-    get_file_size,
-    get_img_dimension,
-    get_valid_img_ext,
-)
+
 from .models import Object
-from utils.response import VsionResponse
+from api.objects.constants import valid_images
+from api.objects.serializers import ObjectSerializer
+from services.s3 import S3Service
+from utils.file import convert_img_to_jpg
+from utils.file import get_file_size
+from utils.file import get_img_dimension
+from utils.file import get_valid_img_ext
 from utils.pagination import VsionPagination
 from utils.parse import parse_s3_path
-from services.s3 import S3Service
-from api.objects.constants import valid_images
-
-import logging
+from utils.response import VsionResponse
 logger = logging.getLogger(__name__)
+
 
 class ObjectViewSet(viewsets.ModelViewSet):
     serializer_class = Object
@@ -67,7 +69,7 @@ class ObjectViewSet(viewsets.ModelViewSet):
             data = request.POST.dict()
 
             if "file" not in request.FILES:
-                raise KeyError({"file": [f"An image file is required."]})
+                raise KeyError({"file": ["An image file is required."]})
 
             file = request.FILES["file"]
 

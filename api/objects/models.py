@@ -1,5 +1,5 @@
-from djongo import models
 from django.utils import timezone
+from djongo import models
 
 
 class ObjectDimension(models.Model):

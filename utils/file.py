@@ -1,8 +1,10 @@
-import os, sys
-from pickletools import optimize
-from PIL import Image
+import os
+import sys
 from io import BytesIO
+
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from PIL import Image
+
 from api.objects.constants import valid_images
 
 
@@ -50,7 +52,7 @@ def get_img_dimension(file):
 
 def get_valid_img_ext(filename):
     ext = filename.split('.')[-1]
-    
+
     return ext if ext in valid_images else False
 
 

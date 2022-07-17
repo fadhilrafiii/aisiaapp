@@ -1,5 +1,6 @@
 from rest_framework import status
 
+
 class VsionResponse:
     def __init__(self, api_type):
         self.api_type = api_type

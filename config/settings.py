@@ -9,8 +9,9 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-from logging import handlers
 import os
+from logging import handlers
+
 import environ
 
 
@@ -91,7 +92,7 @@ DATABASES = {
         "PASSWORD": "hartawan",
         'CLIENT': {
             'host': 'mongodb://localhost:27017/?readPreference=primary&directConnection=true&ssl=false'
-        }  
+        }
     }
 }
 
@@ -163,7 +164,7 @@ LOGGING = {
     'formatters': {
         'verbose': {
             'format': '[%(asctime)s][%(levelname)s]: %(message)s',
-            'datefmt' : "%d/%b/%Y %H:%M:%S"
+            'datefmt': "%d/%b/%Y %H:%M:%S"
         },
     },
     'handlers': {
