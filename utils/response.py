@@ -56,12 +56,8 @@ class VsionResponse:
 
     def list_success(self, data):
         data = dict(data)
-        response_status = (
-            status.HTTP_200_OK
-            if (len(data["results"]) > 0)
-            else status.HTTP_404_NOT_FOUND
-        )
-
+        response_status =  status.HTTP_200_OK
+            
         response_obj = self.create_response_object(
             response_status,
             f"Success get list {self.api_type}",
