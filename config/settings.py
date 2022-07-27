@@ -33,7 +33,8 @@ DEBUG = env("DEBUG") == 'True'
 
 ALLOWED_HOSTS = [
     'localhost',
-    '127.0.0.1'
+    '127.0.0.1',
+    '172.104.163.169'
 ]
 
 # SECURE
