@@ -1,0 +1,62 @@
+import pandas as pd
+import logging
+from PIL import Image
+import glob
+import os
+import pycocotools
+import numpy as np
+import torch
+import time
+import torch.utils.data
+import pandas as pd
+from torchvision import transforms
+import torchvision
+import torchvision.models.detection.ssdlite
+import torch.nn as nn
+from functools import partial
+from torchvision.models.detection import _utils as det_utils
+from torchvision.models.detection.ssdlite import SSDLiteClassificationHead
+
+logger = logging.getLogger(__name__)
+
+def get_model_mobilenet(num_classes):
+  # load an object detection model pre-trained on COCO
+  model = torchvision.models.detection.ssdlite320_mobilenet_v3_large(pretrained = True, trainable_backbone_layers=0)
+  model.nms_thresh=0.2
+  model.score_thresh=0.2
+  # get the number of input features for the classifier
+  in_channels = det_utils.retrieve_out_channels(model.backbone, (320, 320))
+  num_anchors = model.anchor_generator.num_anchors_per_location()
+  norm_layer  = partial(nn.BatchNorm2d, eps=0.001, momentum=0.03)
+  # replace the pre-trained head with a new on
+  model.head.classification_head = SSDLiteClassificationHead(in_channels, num_anchors, num_classes, norm_layer)
+  return model
+
+image_test = "../assets/000000581913_flip_h.jpg"
+
+def get_predictions(image):
+  WEIGHT_PATH= "../assets/mobilenet_sgd.pt"
+  model = get_model_mobilenet(num_classes = 39)
+  model.load_state_dict(torch.load(WEIGHT_PATH, map_location=torch.device('cpu')))
+
+  img = Image.open(image).convert("RGB")
+  tensor_transformer = transforms.ToTensor()
+  img_trans = tensor_transformer(img)
+  idx = 2
+
+  model.eval()
+  start_time = time.time()
+  with torch.no_grad():
+      prediction = model([img_trans])
+  end_time = time.time()
+
+  inference_time = end_time - start_time
+  logger.info(f'Time needed for inference: {inference_time} second(s)')
+
+  class_name= pd.read_csv('../assets/coco_classes38.txt', header=None, names=['classname'])
+  preds=[]
+  for i in range(len(prediction[0]['labels'])):
+    idx = prediction[0]['labels'][i].numpy()
+    preds.append({'box':prediction[0]['boxes'][i].numpy(), 'label':class_name['classname'][idx-1]})
+
+  return preds
