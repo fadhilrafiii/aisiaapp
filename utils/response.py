@@ -57,7 +57,7 @@ class VsionResponse:
     def list_success(self, data):
         data = dict(data)
         response_status =  status.HTTP_200_OK
-            
+
         response_obj = self.create_response_object(
             response_status,
             f"Success get list {self.api_type}",
@@ -174,3 +174,25 @@ class VsionResponse:
         )
 
     """ End section for delete method"""
+
+    def predict_failed(self, error):
+        response_status = status.HTTP_400_BAD_REQUEST
+        return (
+            self.create_response_object(
+                response_status,
+                f"Failed to predict image!",
+                detail=error
+            ),
+            response_status,
+        )
+
+    def predict_success(self, data):
+        response_status = status.HTTP_200_OK
+        return (
+            self.create_response_object(
+                response_status,
+                f"Success to predict image!",
+                data
+            ),
+            response_status,
+        )

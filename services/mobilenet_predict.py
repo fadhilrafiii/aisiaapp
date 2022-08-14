@@ -35,7 +35,7 @@ def get_model_mobilenet(num_classes):
 image_test = "../assets/000000581913_flip_h.jpg"
 
 def get_predictions(image):
-  WEIGHT_PATH= "../assets/mobilenet_sgd.pt"
+  WEIGHT_PATH= "assets/mobilenet_sgd.pt"
   model = get_model_mobilenet(num_classes = 39)
   model.load_state_dict(torch.load(WEIGHT_PATH, map_location=torch.device('cpu')))
 
@@ -53,7 +53,7 @@ def get_predictions(image):
   inference_time = end_time - start_time
   logger.info(f'Time needed for inference: {inference_time} second(s)')
 
-  class_name= pd.read_csv('../assets/coco_classes38.txt', header=None, names=['classname'])
+  class_name= pd.read_csv('assets/coco_classes38.txt', header=None, names=['classname'])
   preds=[]
   for i in range(len(prediction[0]['labels'])):
     idx = prediction[0]['labels'][i].numpy()
