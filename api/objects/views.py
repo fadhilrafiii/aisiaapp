@@ -1,3 +1,4 @@
+import json
 import logging
 
 from bson.objectid import ObjectId
@@ -98,7 +99,11 @@ class ObjectViewSet(viewsets.ModelViewSet):
             data["img_url"] = parse_s3_path(uploaded_file_path)
             data["img_size"] = img_size
             data["img_dimension"] = img_dim
+            if (isinstance(data["annotations"], str)):
+                data["annotations"] = json.loads(data["annotations"])
+
             validated_data = ObjectSerializer(data=data)
+
             if not validated_data.is_valid():
                 raise serializers.ValidationError(validated_data.errors)
 
