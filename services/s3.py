@@ -7,15 +7,16 @@ from utils.parse import get_s3_file_endpoint
 
 class S3Service:
     # botocore config to enable concurrent partial file upload
-    botocore_config = botocore.config.Config(max_pool_connections=20)
-    s3 = boto3.client(
-        service_name="s3",
-        region_name=getattr(settings, "AWS_ACCESS_REGION", None),
-        aws_access_key_id=getattr(settings, "AWS_ACCESS_KEY_ID", None),
-        aws_secret_access_key=getattr(settings, "AWS_SECRET_ACCESS_KEY", None),
-    )
-    bucket_name = getattr(settings, "AWS_BUCKET_NAME", None)
-    aws_s3_url = getattr(settings, "AWS_S3_URL", None)
+    def __init__(self):
+        self.botocore_config = botocore.config.Config(max_pool_connections=20)
+        self.s3 = boto3.client(
+            service_name="s3",
+            region_name=getattr(settings, "AWS_ACCESS_REGION", None),
+            aws_access_key_id=getattr(settings, "AWS_ACCESS_KEY_ID", None),
+            aws_secret_access_key=getattr(settings, "AWS_SECRET_ACCESS_KEY", None),
+        )
+        self.bucket_name = getattr(settings, "AWS_BUCKET_NAME", None)
+        self.aws_s3_url = getattr(settings, "AWS_S3_URL", None)
 
     def get_buckets(self):
         buckets = []
