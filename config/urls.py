@@ -19,7 +19,7 @@ from django.urls import path
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("ml/", include("api.ml.urls")),
-    path("objects/", include("api.objects.urls")),
+    path("api/ml/", include("api.ml.urls")),
+    path("api/objects/", include("api.objects.urls")),
     path("", include("rest_framework.urls")),
 ]
