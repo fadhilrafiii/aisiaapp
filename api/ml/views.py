@@ -6,8 +6,11 @@ from rest_framework.filters import OrderingFilter
 from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
 
-from .models import ML
+from api.ml.constants import VALID_MODEL_TYPE, ModelType
 from api.ml.serializers import MLSerializer
+
+from .models import ML
+from services import mobilenet_predict as MobileNetModel
 from services.s3 import S3Service
 from utils.file import get_file_size
 from utils.pagination import VsionPagination
@@ -127,3 +130,39 @@ class MLViewSet(viewsets.ModelViewSet):
         except Exception as e:
             response_data, status = self.response.delete_failed(f"Error: {str(e)}")
             return Response(response_data, status)
+
+class PredictViewSet(viewsets.ModelViewSet):
+    response = VsionResponse("ML Model")
+
+
+    def create(self, request):
+        try:
+            if 'image' not in request.FILES:
+                raise KeyError({"image": ["A valid image is required."]})
+
+            image = request.FILES["image"]
+            data = request.POST.dict()
+
+            if 'model' not in data:
+                raise KeyError({"model": ["Model type is not specified. Try model='MobileNet'."]})
+
+            model_type = data['model']
+            if (model_type not in VALID_MODEL_TYPE):
+                raise Exception(f"{model_type} is not included in valid model type! Current valid model type 'MobileNet'")
+
+            if (model_type == ModelType.MOBILE_NET):
+                result = MobileNetModel.get_predictions(image)
+                print('PADIL', result)
+                response_data, status = self.response.predict_success(result)
+
+                return Response(response_data, status)
+
+        except KeyError as e:
+            error_obj, status = self.response.params_invalid(e.args[0])
+            return Response(error_obj, status)
+        except Exception as e:
+            response_data, status = self.response.predict_failed(f"Error: {str(e)}")
+            return Response(response_data, status)
+
+
+
