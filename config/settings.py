@@ -149,7 +149,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = "/static/"
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
@@ -158,6 +157,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # AWS
 AWS_BUCKET_NAME = env("AWS_BUCKET_NAME")
 AWS_S3_URL = env("AWS_S3_URL")
+AWS_ACCESS_REGION = env("AWS_ACCESS_REGION")
+AWS_ACCESS_KEY_ID = env("AWS_ACCESS_SECRET_ID")
+AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY")
 
 # Email Configuration ==========================================================
 ADMINS = [('Me', env('ADMIN_EMAIL'))]
