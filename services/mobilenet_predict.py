@@ -54,7 +54,7 @@ def get_predictions(image, ayam = 0):
   else:
     print('PADIL FASTERRCNN')
     print('=====================')
-    WEIGHT_PATH= "assets/faster_rcnn_sgd.pt"
+    WEIGHT_PATH= "faster_rcnn_sgd.pt"
     print('PADIL FASTERRCNN GET MODEL')
     model = get_model_faster_rcnn(num_classes = 39)
     print('PADIL FASTERRCNN GET MODEL KELAR')
