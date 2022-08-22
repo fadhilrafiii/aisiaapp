@@ -16,8 +16,18 @@ import torch.nn as nn
 from functools import partial
 from torchvision.models.detection import _utils as det_utils
 from torchvision.models.detection.ssdlite import SSDLiteClassificationHead
+from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 
 logger = logging.getLogger(__name__)
+
+def get_model_faster_rcnn(num_classes):
+  # load an object detection model pre-trained on COCO
+  model = torchvision.models.detection.fasterrcnn_resnet50_fpn(weights='FasterRCNN_ResNet50_FPN_Weights.DEFAULT', trainable_backbone_layers=0, box_nms_thresh=0.3, box_score_thresh=0.3)
+  # get the number of input features for the classifier
+  in_features = model.roi_heads.box_predictor.cls_score.in_features
+  # replace the pre-trained head with a new on
+  model.roi_heads.box_predictor = FastRCNNPredictor(in_features,num_classes)
+  return model
 
 def get_model_mobilenet(num_classes):
   # load an object detection model pre-trained on COCO
@@ -34,10 +44,21 @@ def get_model_mobilenet(num_classes):
 
 image_test = "../assets/000000581913_flip_h.jpg"
 
-def get_predictions(image):
-  WEIGHT_PATH= "assets/mobilenet_sgd.pt"
-  model = get_model_mobilenet(num_classes = 39)
-  model.load_state_dict(torch.load(WEIGHT_PATH, map_location=torch.device('cpu')))
+def get_predictions(image, ayam = 0):
+  if (ayam == 1):
+    print('PADIL MOBILENET')
+    print('=====================')
+    WEIGHT_PATH= "assets/mobilenet_sgd.pt"
+    model = get_model_mobilenet(num_classes = 39)
+    model.load_state_dict(torch.load(WEIGHT_PATH, map_location=torch.device('cpu')))
+  else:
+    print('PADIL FASTERRCNN')
+    print('=====================')
+    WEIGHT_PATH= "assets/faster_rcnn_sgd.pt"
+    print('PADIL FASTERRCNN GET MODEL')
+    model = get_model_faster_rcnn(num_classes = 39)
+    print('PADIL FASTERRCNN GET MODEL KELAR')
+    model.load_state_dict(torch.load(WEIGHT_PATH, map_location=torch.device('cpu')))
 
   img = Image.open(image).convert("RGB")
   tensor_transformer = transforms.ToTensor()

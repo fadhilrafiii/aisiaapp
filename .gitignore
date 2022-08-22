@@ -131,3 +131,5 @@ dmypy.json
 .vscode/
 
 logs
+
+assets/faster_rcnn_sgd.pt
