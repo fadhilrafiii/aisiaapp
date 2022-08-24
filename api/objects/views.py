@@ -70,17 +70,14 @@ class ObjectViewSet(viewsets.ModelViewSet):
         try:
             data = request.data
 
-            print(data, 'HAHAYYY')
             if "image" not in data:
                 raise KeyError({"image": ["An image file is required."]})
 
             file = data["image"]
 
-            print('TEST HAHAY')
             # Convert image to jpg
             img_name = 'img' + str(uuid.uuid4())
             img_file = convert_base64_to_jpg(file, img_name)
-            print('CREATE IMAGE', img_file)
             # Get img property
             img_dim = get_img_dimension(img_file)
             img_size = get_file_size(img_file)

@@ -1,3 +1,4 @@
+import uuid
 from bson.objectid import ObjectId
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import serializers
@@ -12,7 +13,7 @@ from api.ml.serializers import MLSerializer
 from .models import ML
 from services import mobilenet_predict as MobileNetModel
 from services.s3 import S3Service
-from utils.file import get_file_size
+from utils.file import convert_base64_to_jpg, get_file_size
 from utils.pagination import VsionPagination
 from utils.parse import parse_s3_path
 from utils.response import VsionResponse
@@ -136,22 +137,27 @@ class PredictViewSet(viewsets.ModelViewSet):
 
 
     def create(self, request):
+        data = request.data
+
         try:
-            if 'image' not in request.FILES:
+            if 'image' not in data:
                 raise KeyError({"image": ["A valid image is required."]})
 
-            image = request.FILES["image"]
-            data = request.POST.dict()
+            image = data["image"]
 
             if 'model' not in data:
                 raise KeyError({"model": ["Model type is not specified. Try model='MobileNet'."]})
+
 
             model_type = data['model']
             if (model_type not in VALID_MODEL_TYPE):
                 raise Exception(f"{model_type} is not included in valid model type! Current valid model type 'MobileNet'")
 
+            img_name = 'img' + str(uuid.uuid4())
+            img_file = convert_base64_to_jpg(image, img_name)
+
             if (model_type == ModelType.MOBILE_NET):
-                result = MobileNetModel.get_predictions(image)
+                result = MobileNetModel.get_predictions(img_file, model_type)
                 response_data, status = self.response.predict_success(result)
 
                 return Response(response_data, status)

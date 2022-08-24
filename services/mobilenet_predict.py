@@ -44,20 +44,14 @@ def get_model_mobilenet(num_classes):
 
 image_test = "../assets/000000581913_flip_h.jpg"
 
-def get_predictions(image, ayam = 0):
-  if (ayam == 1):
-    print('PADIL MOBILENET')
-    print('=====================')
+def get_predictions(image, model_type):
+  if (model_type == 'MobileNet'):
     WEIGHT_PATH= "assets/mobilenet_sgd.pt"
     model = get_model_mobilenet(num_classes = 39)
     model.load_state_dict(torch.load(WEIGHT_PATH, map_location=torch.device('cpu')))
   else:
-    print('PADIL FASTERRCNN')
-    print('=====================')
     WEIGHT_PATH= "faster_rcnn_sgd.pt"
-    print('PADIL FASTERRCNN GET MODEL')
     model = get_model_faster_rcnn(num_classes = 39)
-    print('PADIL FASTERRCNN GET MODEL KELAR')
     model.load_state_dict(torch.load(WEIGHT_PATH, map_location=torch.device('cpu')))
 
   img = Image.open(image).convert("RGB")
