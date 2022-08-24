@@ -8,7 +8,6 @@ class ML(models.Model):
     updated_date = models.DateTimeField(auto_now=timezone.now)
     file_path = models.URLField()
     file_size = models.IntegerField(default=0)
-    version = models.IntegerField(unique=True)
     name = models.CharField(max_length=50, blank=True, null=True)
 
     class Meta:

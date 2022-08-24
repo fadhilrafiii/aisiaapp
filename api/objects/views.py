@@ -1,5 +1,6 @@
 import json
 import logging
+import uuid
 
 from bson.objectid import ObjectId
 from rest_framework import serializers
@@ -12,12 +13,12 @@ from .models import Object
 from api.objects.constants import valid_images
 from api.objects.serializers import ObjectSerializer
 from services.s3 import S3Service
-from utils.file import convert_img_to_jpg
+from utils.file import convert_base64_to_jpg
 from utils.file import get_file_size
 from utils.file import get_img_dimension
 from utils.file import get_valid_img_ext
 from utils.pagination import VsionPagination
-from utils.parse import parse_s3_path
+from utils.parse import parse_annotations, parse_s3_path
 from utils.response import VsionResponse
 logger = logging.getLogger(__name__)
 
@@ -67,23 +68,19 @@ class ObjectViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         try:
-            data = request.POST.dict()
+            data = request.data
 
-            if "file" not in request.FILES:
-                raise KeyError({"file": ["An image file is required."]})
+            print(data, 'HAHAYYY')
+            if "image" not in data:
+                raise KeyError({"image": ["An image file is required."]})
 
-            file = request.FILES["file"]
+            file = data["image"]
 
-            # Check image file extension
-            file_ext = get_valid_img_ext(file.name)
-            if not file_ext:
-                raise KeyError(
-                    {"file": [f"Accepted image file extensions are {valid_images}."]}
-                )
-
+            print('TEST HAHAY')
             # Convert image to jpg
-            img_file = convert_img_to_jpg(file)
-
+            img_name = 'img' + str(uuid.uuid4())
+            img_file = convert_base64_to_jpg(file, img_name)
+            print('CREATE IMAGE', img_file)
             # Get img property
             img_dim = get_img_dimension(img_file)
             img_size = get_file_size(img_file)
@@ -95,12 +92,15 @@ class ObjectViewSet(viewsets.ModelViewSet):
             )
 
             # Add and cast rest data value
-            data["img_name"] = file.name
+            data["img_name"] = img_name
             data["img_url"] = parse_s3_path(uploaded_file_path)
             data["img_size"] = img_size
             data["img_dimension"] = img_dim
             if (isinstance(data["annotations"], str)):
                 data["annotations"] = json.loads(data["annotations"])
+
+            if (data["annotations"] is not None):
+                data["annotations"] = parse_annotations(data["annotations"])
 
             validated_data = ObjectSerializer(data=data)
 

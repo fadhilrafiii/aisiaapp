@@ -5,13 +5,24 @@ from .models import Annotation, Object
 
 
 class AnnotationSerializer(serializers.ModelSerializer):
-    coordinates = serializers.ListField(child=serializers.DictField())
+    box =  serializers.SerializerMethodField(read_only = True)
+    xmin = serializers.FloatField(write_only=True)
+    ymin = serializers.FloatField(write_only=True)
+    xmax = serializers.FloatField(write_only=True)
+    ymax = serializers.FloatField(write_only=True)
+
+    def get_box(self, obj):
+        return [obj.xmin, obj.ymin, obj.xmax, obj.ymax]
 
     class Meta:
         model = Annotation
         fields = [
             "label",
-            "coordinates"
+            "xmin",
+            "ymin",
+            "xmax",
+            "ymax",
+            "box",
         ]
 
 

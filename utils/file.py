@@ -1,9 +1,11 @@
 import os
 import sys
+import base64
 from io import BytesIO
 
 from django.core.files.uploadedfile import InMemoryUploadedFile
-from PIL import Image
+from PIL import Image, ImageFile
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 from api.objects.constants import valid_images
 
@@ -17,24 +19,24 @@ def get_file_size(file):
     return file_size
 
 
-def convert_img_to_jpg(img):
-    img_data = Image.open(img)
+def convert_base64_to_jpg(img, img_name):
+    img_data = Image.open(BytesIO(base64.b64decode(img)))
     img_data = img_data.convert("RGB")
     width, height = img_data.size
 
     temp_store = BytesIO()
     # Resize image
-    compressed_width = 512
+    compressed_width = 320
     compressed_heigth = int(height / width * compressed_width)
     compressed_size = (compressed_width, compressed_heigth)
     img_data = img_data.resize(compressed_size, Image.ANTIALIAS)
+
     img_data.save(temp_store, format="JPEG", optimize=True)
 
-    [file_name, _] = img.name.split(".")
     file = InMemoryUploadedFile(
         temp_store,
         None,
-        f"{file_name}.jpg",
+        f"{img_name}.jpg",
         "image/jpeg",
         sys.getsizeof(temp_store),
         None,

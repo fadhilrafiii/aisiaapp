@@ -1,17 +1,12 @@
 from django.utils import timezone
 from djongo import models
 
-
-class Coordinate(models.Model):
-    x = models.FloatField()
-    y = models.FloatField()
-
-    class Meta:
-        abstract = True
-
 class Annotation(models.Model):
     id = models.ObjectIdField()
-    coordinates = models.ArrayField(model_container=Coordinate)
+    xmin = models.FloatField(null=True, blank=True)
+    xmax = models.FloatField(null=True, blank=True)
+    ymin = models.FloatField(null=True, blank=True)
+    ymax = models.FloatField(null=True, blank=True)
     label = models.CharField(max_length=50, verbose_name='Image Label')
 
     objects = models.DjongoManager()

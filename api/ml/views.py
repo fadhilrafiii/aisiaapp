@@ -152,7 +152,6 @@ class PredictViewSet(viewsets.ModelViewSet):
 
             if (model_type == ModelType.MOBILE_NET):
                 result = MobileNetModel.get_predictions(image)
-                print('PADIL', result)
                 response_data, status = self.response.predict_success(result)
 
                 return Response(response_data, status)
