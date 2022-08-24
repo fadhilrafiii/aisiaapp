@@ -26,7 +26,6 @@ class MLViewSet(viewsets.ModelViewSet):
     pagination_class = VsionPagination
 
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['version']
     search_fields = ['name']
     ordering_fields = ['name', 'created_date', 'updated_date']
 
@@ -35,6 +34,15 @@ class MLViewSet(viewsets.ModelViewSet):
 
     def list(self, request):
         try:
+            query = request.GET
+
+            if "last" in query and  query["last"] == "true":
+                last_model = ML.objects.latest('updated_date')
+                serializer = MLSerializer(last_model)
+
+                response_data, status = self.response.retrieve_success('last', serializer.data)
+                return Response(response_data, status)
+
             filtered_data = self.filter_queryset(self.get_queryset())
             page = self.paginate_queryset(filtered_data)
             serializer = MLSerializer(page, many=True)
@@ -70,15 +78,7 @@ class MLViewSet(viewsets.ModelViewSet):
             if "file" not in request.FILES:
                 raise KeyError({"file": ["A valid file is required."]})
 
-            if "version" not in data:
-                raise KeyError({"version": ["A valid integer is required."]})
-
             file = request.FILES["file"]
-
-            # Check extension of model file
-            [_, file_ext] = file.name.split(".")
-            # if file_ext != "h5":
-            #     raise KeyError({"file": ["File doesn't have '.h5' extension."]})
 
             # Upload file to S3
             file_size = get_file_size(file)
@@ -89,10 +89,9 @@ class MLViewSet(viewsets.ModelViewSet):
 
             # Add and cast rest data value
             data["file_path"] = parse_s3_path(uploaded_file_path)
-            data["version"] = int(data["version"][0])
             data["file_size"] = file_size
             if "name" not in data:
-                data["name"] = f'ML Model-{data["version"]}'
+                data["name"] = f'ML Model-{str(uuid.uuid4())}'
             validated_data = MLSerializer(data=data)
 
             if not validated_data.is_valid():
