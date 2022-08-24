@@ -31,11 +31,14 @@ class S3Service:
         return {"url": file_path, "data": file["Body"]}
 
     def upload_file(self, file, folder_name=None):
-        file_path = f"{folder_name}/{file.name}" if (folder_name) else file.name
+        try:
+            file_path = f"{folder_name}/{file.name}" if (folder_name) else file.name
 
-        self.s3.upload_fileobj(file, self.bucket_name, file_path)
+            self.s3.upload_fileobj(file, self.bucket_name, file_path)
 
-        return f"https://{self.bucket_name}.{self.aws_s3_url}/{file_path}"
+            return f"https://{self.bucket_name}.{self.aws_s3_url}/{file_path}"
+        except Exception as e:
+            raise e
 
     def delete_file(self, file_path):
         endpoint = get_s3_file_endpoint(file_path)

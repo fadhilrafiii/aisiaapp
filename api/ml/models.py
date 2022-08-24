@@ -3,7 +3,7 @@ from djongo import models
 
 
 class ML(models.Model):
-    _id = models.ObjectIdField()
+    id = models.ObjectIdField()
     created_date = models.DateTimeField(auto_now_add=timezone.now)
     updated_date = models.DateTimeField(auto_now=timezone.now)
     file_path = models.URLField()
