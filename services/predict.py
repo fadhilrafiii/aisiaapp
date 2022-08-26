@@ -50,7 +50,7 @@ def get_predictions(image, model_type):
     model = get_model_mobilenet(num_classes = 39)
     model.load_state_dict(torch.load(WEIGHT_PATH, map_location=torch.device('cpu')))
   else:
-    WEIGHT_PATH= "faster_rcnn_sgd.pt"
+    WEIGHT_PATH= "assets/faster_rcnn_sgd.pt"
     model = get_model_faster_rcnn(num_classes = 39)
     model.load_state_dict(torch.load(WEIGHT_PATH, map_location=torch.device('cpu')))
 

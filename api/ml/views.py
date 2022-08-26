@@ -11,7 +11,7 @@ from api.ml.constants import VALID_MODEL_TYPE, ModelType
 from api.ml.serializers import MLSerializer
 
 from .models import ML
-from services import mobilenet_predict as MobileNetModel
+from services import predict as PredictService
 from services.s3 import S3Service
 from utils.file import convert_base64_to_jpg, get_file_size
 from utils.pagination import VsionPagination
@@ -155,8 +155,8 @@ class PredictViewSet(viewsets.ModelViewSet):
             img_name = 'img' + str(uuid.uuid4())
             img_file = convert_base64_to_jpg(image, img_name)
 
-            if (model_type == ModelType.MOBILE_NET):
-                result = MobileNetModel.get_predictions(img_file, model_type)
+            if (model_type == ModelType.MOBILE_NET or model_type == ModelType.FASTER_RCNN):
+                result = PredictService.get_predictions(img_file, model_type)
                 response_data, status = self.response.predict_success(result)
 
                 return Response(response_data, status)
