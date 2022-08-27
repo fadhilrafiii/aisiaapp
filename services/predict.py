@@ -71,7 +71,17 @@ def get_predictions(image, model_type):
   class_name= pd.read_csv('assets/coco_classes38.txt', header=None, names=['classname'])
   preds=[]
   for i in range(len(prediction[0]['labels'])):
-    idx = prediction[0]['labels'][i].numpy()
-    preds.append({'box':prediction[0]['boxes'][i].numpy(), 'label':class_name['classname'][idx-1]})
+    tmp=[]
+    tmp.append(i)
+    tmp.append(float(prediction[0]['boxes'][i][1].numpy()))
+    preds.append(tmp)
+    
+  preds.sort(key=lambda x: x[1])
+  
+  result=[]
+  for i in range(len(preds)):
+    idx = preds[i][0]
+    class_idx=prediction[0]['labels'][idx].numpy()
+    result.append({'box':prediction[0]['boxes'][idx].numpy(), 'label':class_name['classname'][class_idx-1]}) 
 
   return preds
