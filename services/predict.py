@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 def get_model_faster_rcnn(num_classes):
   # load an object detection model pre-trained on COCO
-  model = torchvision.models.detection.fasterrcnn_resnet50_fpn(weights='FasterRCNN_ResNet50_FPN_Weights.DEFAULT', trainable_backbone_layers=0, box_nms_thresh=0.3, box_score_thresh=0.3)
+  model = torchvision.models.detection.fasterrcnn_resnet50_fpn(weights='FasterRCNN_ResNet50_FPN_Weights.DEFAULT', trainable_backbone_layers=0, box_nms_thresh=0.3, box_score_thresh=0.5)
   # get the number of input features for the classifier
   in_features = model.roi_heads.box_predictor.cls_score.in_features
   # replace the pre-trained head with a new on
@@ -71,17 +71,7 @@ def get_predictions(image, model_type):
   class_name= pd.read_csv('assets/coco_classes38.txt', header=None, names=['classname'])
   preds=[]
   for i in range(len(prediction[0]['labels'])):
-    tmp=[]
-    tmp.append(i)
-    tmp.append(float(prediction[0]['boxes'][i][1].numpy()))
-    preds.append(tmp)
-    
-  preds.sort(key=lambda x: x[1])
-  
-  result=[]
-  for i in range(len(preds)):
-    idx = preds[i][0]
-    class_idx=prediction[0]['labels'][idx].numpy()
-    result.append({'box':prediction[0]['boxes'][idx].numpy(), 'label':class_name['classname'][class_idx-1]}) 
+    idx = prediction[0]['labels'][i].numpy()
+    preds.append({'box':prediction[0]['boxes'][i].numpy(), 'label':class_name['classname'][idx-1]})
 
   return preds
